@@ -157,7 +157,7 @@ require('lazy').setup({
         changedelete = { text = '~' },
       },
       on_attach = function(bufnr)
-        vim.keymap.set('n', '<leader>gp', require('gitsigns').prev_hunk, { buffer = bufnr, desc = '[G]o to [P]revious Hunk' })
+        vim.keymap.set('n', '<leader>ge', require('gitsigns').prev_hunk, { buffer = bufnr, desc = '[G]o to [E]arlier Hunk' })
         vim.keymap.set('n', '<leader>gn', require('gitsigns').next_hunk, { buffer = bufnr, desc = '[G]o to [N]ext Hunk' })
         vim.keymap.set('n', '<leader>ph', require('gitsigns').preview_hunk, { buffer = bufnr, desc = '[P]review [H]unk' })
       end,
@@ -501,6 +501,19 @@ require('nvim-treesitter.configs').setup {
     },
   },
 }
+
+-- Fugitive key mappings
+vim.keymap.set( 'n', '<leader>ga', ':Git add %:p<CR><CR>',    { desc = '[G]it [A]dd' })
+vim.keymap.set( 'n', '<leader>gs', ':Git<CR>',        { desc = '[G]it [S]tatus' })
+vim.keymap.set( 'n', '<leader>gb', ':Git blame<CR>',  { desc = '[G]it [B]lame' })
+vim.keymap.set( 'n', '<leader>gd', ':Gdiffsplit<CR>', { desc = '[G]it [D]iff' })
+vim.keymap.set( 'n', '<leader>gc', ':G commit<CR><CR>',    { desc = '[G]it [C]ommit' })
+vim.keymap.set( 'n', '<leader>gl', ':Glog<CR>',       { desc = '[G]it [L]og' })
+vim.keymap.set( 'n', '<leader>gp', ':Dispatch! git pull<CR>',   { desc = '[G]it [P]ull' })
+vim.keymap.set( 'n', '<leader>gP', ':Dispatch! git push<CR>',   { desc = '[G]it [P]ush' })
+vim.keymap.set( 'n', '<leader>gss', ':Git stash<CR>', { desc = '[G]it [S]tash' })
+vim.keymap.set( 'n', '<leader>gsv', ':vert Git<CR>',  { desc = '[G]it [S]tatus [V]ertical' })
+
 
 -- Diagnostic keymaps
 vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous diagnostic message' })
