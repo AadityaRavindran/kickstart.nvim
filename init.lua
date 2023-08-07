@@ -440,7 +440,7 @@ vim.keymap.set('n', '<C-p>', require('telescope.builtin').find_files, { desc = '
 -- See `:help nvim-treesitter`
 require('nvim-treesitter.configs').setup {
   -- Add languages to be installed here that you want installed for treesitter
-  ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'tsx', 'typescript', 'vimdoc', 'vim' },
+  ensure_installed = { 'c', 'cpp', 'lua', 'python', 'rust', 'vimdoc', 'vim' },
 
   -- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
   auto_install = false,
@@ -590,6 +590,12 @@ mason_lspconfig.setup {
 mason_lspconfig.setup_handlers {
   function(server_name)
     require('lspconfig')[server_name].setup {
+      opts = {
+        setup = {
+          clangd = function (_,opts)
+          opts.cmd = {"clangd", "--header-insertion=never"}
+          end},
+      },
       capabilities = capabilities,
       on_attach = on_attach,
       settings = servers[server_name],
