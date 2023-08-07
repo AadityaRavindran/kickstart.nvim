@@ -509,8 +509,8 @@ vim.keymap.set( 'n', '<leader>gb', ':Git blame<CR>',  { desc = '[G]it [B]lame' }
 vim.keymap.set( 'n', '<leader>gd', ':Gdiffsplit<CR>', { desc = '[G]it [D]iff' })
 vim.keymap.set( 'n', '<leader>gc', ':G commit<CR><CR>',    { desc = '[G]it [C]ommit' })
 vim.keymap.set( 'n', '<leader>gl', ':Glog<CR>',       { desc = '[G]it [L]og' })
-vim.keymap.set( 'n', '<leader>gp', ':Dispatch! git pull<CR>',   { desc = '[G]it [P]ull' })
-vim.keymap.set( 'n', '<leader>gP', ':Dispatch! git push<CR>',   { desc = '[G]it [P]ush' })
+vim.keymap.set( 'n', '<leader>gp', ':Git pull<CR>',   { desc = '[G]it [P]ull' })
+vim.keymap.set( 'n', '<leader>gP', ':Git push<CR>',   { desc = '[G]it [P]ush' })
 vim.keymap.set( 'n', '<leader>gss', ':Git stash<CR>', { desc = '[G]it [S]tash' })
 vim.keymap.set( 'n', '<leader>gsv', ':vert Git<CR>',  { desc = '[G]it [S]tatus [V]ertical' })
 
