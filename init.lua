@@ -323,7 +323,8 @@ vim.g.neotree_hide_dotfiles = 1      -- Hide dotfiles in the tree
 vim.g.neotree_highlight_current_file = 1  -- Highlight the current file in the tree
 
 -- Set key mapping to toggle Neotree
-vim.api.nvim_set_keymap('n', '<Leader>n', ':NvimTreeToggle<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<Leader>n', ':Neotree toggle<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('', '<Leader>N', ':Neotree reveal<CR>', { noremap = true, silent = true })
 
 -- [[ Configure Neotree's fonts ]]
 require("neo-tree").setup({
