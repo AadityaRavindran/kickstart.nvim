@@ -42,6 +42,7 @@ P.S. You can delete this when you're done too. It's your config now :)
 --  NOTE: Must happen before plugins are required (otherwise wrong leader will be used)
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
+vim.o.colorcolumn = 120
 vim.o.cursorline = true
 vim.o.relativenumber = true
 vim.o.tabstop = 2
@@ -92,12 +93,15 @@ require('lazy').setup({
 
   -- A better vim terminal
   'numToStr/FTerm.nvim',
+  -- Debugging
+  'puremourning/vimspector',
 
   -- Add quality of life improvement plugins
   'vim-airline/vim-airline',
   'vim-airline/vim-airline-themes',
-  'github/copilot.vim',
+  -- 'github/copilot.vim',
   'embear/vim-uncrustify',
+  'sakhnik/nvim-gdb',
   -- Neovim tree for an explorer view
   {
     'nvim-neo-tree/neo-tree.nvim',
@@ -521,6 +525,15 @@ vim.keymap.set( 'n', '<leader>gP', ':Git push<CR>',   { desc = '[G]it [P]ush' })
 vim.keymap.set( 'n', '<leader>gss', ':Git stash<CR>', { desc = '[G]it [S]tash' })
 vim.keymap.set( 'n', '<leader>gsv', ':vert Git<CR>',  { desc = '[G]it [S]tatus [V]ertical' })
 
+-- Vimspector key mappings
+vim.g['vimspector_enable_mappings'] = 'HUMAN'
+vim.keymap.set( 'n', '<leader>vl', ':call vimspector#Launch()<CR>', { desc = '[V]imspector [L]aunch' })
+vim.keymap.set( 'n', '<leader>vr', ':VimspectorReset<CR>', { desc = '[V]imspector [R]eset' })
+vim.keymap.set( 'n', '<leader>ve', ':VimspectorEval<CR>', { desc = '[V]imspector [E]val' })
+vim.keymap.set( 'n', '<leader>vw', ':VimspectorWatch<CR>', { desc = '[V]imspector [W]atch' })
+vim.keymap.set( 'n', '<leader>vo', ':VimspectorShowOutput<CR>', { desc = '[V]imspector Show [O]utput' })
+vim.keymap.set( 'n', '<leader>vi', '<Plug>VimspectorBalloonEval', { desc = '[Vi]mspector Balloon Eval' })
+vim.keymap.set( 'x', '<leader>vi', '<Plug>VimspectorBalloonEval', { desc = '[Vi]mspector Balloon Eval' })
 
 -- Diagnostic keymaps
 vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous diagnostic message' })
