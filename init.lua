@@ -42,13 +42,13 @@ P.S. You can delete this when you're done too. It's your config now :)
 --  NOTE: Must happen before plugins are required (otherwise wrong leader will be used)
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
-vim.o.colorcolumn = 120
 vim.o.cursorline = true
 vim.o.relativenumber = true
 vim.o.tabstop = 2
 vim.o.shiftwidth = 2
 vim.o.expandtab = true
 vim.o.smartindent = true
+vim.opt.colorcolumn = '120'
 vim.opt.list = true
 vim.opt.listchars:append({ space = '·' })
 
