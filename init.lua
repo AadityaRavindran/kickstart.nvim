@@ -48,7 +48,7 @@ vim.o.tabstop = 2
 vim.o.shiftwidth = 2
 vim.o.expandtab = true
 vim.o.smartindent = true
-vim.opt.colorcolumn = '120'
+vim.opt.colorcolumn = '100,120'
 vim.opt.list = true
 vim.opt.listchars:append({ space = '·' })
 
@@ -95,6 +95,8 @@ require('lazy').setup({
   'numToStr/FTerm.nvim',
   -- Debugging
   'puremourning/vimspector',
+  -- Undo Tree to get away from undo file length limit of 255
+  'pixelastic/vim-undodir-tree',
 
   -- Add quality of life improvement plugins
   'vim-airline/vim-airline',
@@ -347,6 +349,12 @@ vim.api.nvim_set_keymap('', '<Leader>N', ':Neotree reveal<CR>', { noremap = true
 
 -- [[ Configure Neotree's fonts ]]
 require("neo-tree").setup({
+  sources = {
+    "filesystem",
+    "buffers",
+    "git_status",
+    "document_symbols",
+  },
   default_component_configs = {
     icon = {
       folder_empty = "󰜌",
@@ -381,12 +389,16 @@ require("neo-tree").setup({
   },
   -- Add this section only if you've configured source selector.
   source_selector = {
+    winbar = true,
     sources = {
       { source = "filesystem", display_name = " 󰉓 Files " },
-      { source = "git_status", display_name = " 󰊢 Git " },
+      { source = "document_symbols", display_name = "󰆧 Symbols " },
+      { source = "buffers", display_name = " 󰈙 Buffers " },
+      --{ source = "git_status", display_name = " 󰊢 Git " },
     },
   },
   -- Other options ...
+  filesystem = { follow_current_file = { enabled = true } },
 })
 
 -- [[ Configure FTerm ]]
@@ -535,8 +547,8 @@ vim.keymap.set( 'n', '<leader>gc', ':G commit<CR><CR>',    { desc = '[G]it [C]om
 vim.keymap.set( 'n', '<leader>gl', ':Glog<CR>',       { desc = '[G]it [L]og' })
 vim.keymap.set( 'n', '<leader>gp', ':Git pull<CR>',   { desc = '[G]it [P]ull' })
 vim.keymap.set( 'n', '<leader>gP', ':Git push<CR>',   { desc = '[G]it [P]ush' })
-vim.keymap.set( 'n', '<leader>gss', ':Git stash<CR>', { desc = '[G]it [S]tash' })
-vim.keymap.set( 'n', '<leader>gsv', ':vert Git<CR>',  { desc = '[G]it [S]tatus [V]ertical' })
+vim.keymap.set( 'n', '<leader>gS', ':Git stash<CR>', { desc = '[G]it [S]tash' })
+vim.keymap.set( 'n', '<leader>gv', ':vert Git<CR>',  { desc = '[G]it Status [V]ertical' })
 
 -- Vimspector key mappings
 vim.g['vimspector_enable_mappings'] = 'HUMAN'
@@ -655,7 +667,8 @@ mason_lspconfig.setup_handlers {
         setup = {
           clangd = function (_,opts)
           opts.cmd = {"clangd", "--header-insertion=never"}
-          end},
+          end
+        },
       },
       capabilities = capabilities,
       on_attach = on_attach,
