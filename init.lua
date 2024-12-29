@@ -690,6 +690,18 @@ mason_lspconfig.setup_handlers {
   end
 }
 
+require('lspconfig').pylsp.setup {
+  settings = {
+    pylsp = {
+      plugins = {
+        pycodestyle = {
+          maxLineLength = 120
+        }
+      }
+    }
+  }
+}
+
 -- [[ Configure nvim-cmp ]]
 -- See `:help cmp`
 local cmp = require 'cmp'
