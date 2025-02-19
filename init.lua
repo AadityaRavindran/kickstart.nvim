@@ -361,7 +361,9 @@ vim.g.neotree_width = 30             -- Set the width of the tree
 vim.g.neotree_auto_open = 1          -- Automatically open Neotree on startup
 vim.g.neotree_auto_close = 1         -- Automatically close Neotree when opening a file
 vim.g.neotree_follow = 1             -- Update the tree automatically when changing buffers
-vim.g.neotree_hide_dotfiles = 1      -- Hide dotfiles in the tree
+-- vim.g.neotree_visible = 1            -- Dim hidden files in the tree instead of hiding completely
+-- vim.g.neotree_hide_dotfiles = 0      -- Hide dotfiles in the tree
+-- vim.g.neotree_hide_gitignored = 1    -- Hide gitignore files in the tree
 vim.g.neotree_highlight_current_file = 1  -- Highlight the current file in the tree
 
 -- Set key mapping to toggle Neotree
@@ -419,7 +421,22 @@ require("neo-tree").setup({
     },
   },
   -- Other options ...
-  filesystem = { follow_current_file = { enabled = true } },
+  filesystem = {
+    follow_current_file = { enabled = true },
+    filtered_items = {
+      visible = false, -- hide filtered items on open
+      hide_gitignored = false,
+      hide_dotfiles = false,
+      hide_by_name = {
+        ".github",
+        ".gitignore",
+        "package-lock.json",
+        ".changeset",
+        ".prettierrc.json",
+      },
+      never_show = { ".git" },
+      },
+  },
 })
 
 -- [[ Configure FTerm ]]
