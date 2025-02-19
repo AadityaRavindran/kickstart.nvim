@@ -417,7 +417,7 @@ require("neo-tree").setup({
       { source = "filesystem", display_name = " 󰉓 Files " },
       { source = "document_symbols", display_name = "󰆧 Symbols " },
       { source = "buffers", display_name = " 󰈙 Buffers " },
-      --{ source = "git_status", display_name = " 󰊢 Git " },
+      { source = "git_status", display_name = " 󰊢 Git " },
     },
   },
   -- Other options ...
