@@ -89,6 +89,36 @@ P.S. You can delete this when you're done too. It's your config now! :)
 --  NOTE: Must happen before plugins are loaded (otherwise wrong leader will be used)
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
+vim.o.cursorline = true
+vim.o.relativenumber = true
+vim.o.tabstop = 2
+vim.o.shiftwidth = 2
+vim.o.expandtab = true
+vim.o.smartindent = true
+vim.opt.list = true
+vim.opt.listchars:append { space = '·' }
+
+-- NOTE: Aaditya added this block
+vim.filetype.add({ extension = { launch = "xml" } })
+vim.opt.colorcolumn = '100,120'
+vim.opt.runtimepath:remove(vim.fn.expand '~/.local/share/nvim/lazy')
+vim.opt.runtimepath:prepend(vim.fn.expand '~/nvim-plugins')
+-- Add custom keymaps
+vim.api.nvim_set_keymap('i', '<C-h>', '<Left>', { noremap = true })
+vim.api.nvim_set_keymap('i', '<C-l>', '<Right>', { noremap = true })
+vim.api.nvim_set_keymap('i', '<C-j>', '<Down>', { noremap = true })
+vim.api.nvim_set_keymap('i', '<C-k>', '<Up>', { noremap = true })
+vim.api.nvim_set_keymap('i', '<C-s>', '<ESC>:w<CR>', { noremap = true })
+vim.api.nvim_set_keymap('', '<C-s>', ':w<CR>', { noremap = true })
+vim.api.nvim_set_keymap('', '<C-d>', '<C-d>zz', { noremap = true })
+vim.api.nvim_set_keymap('', '<C-u>', '<C-u>zz', { noremap = true })
+vim.api.nvim_set_keymap('', '<C-p>', 'viw"0p<ESC>', { noremap = true })
+-- Remap for dealing with word wrap
+vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
+vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
+
+-- Unless you are still migrating, remove the deprecated commands from v1.x
+vim.cmd [[ let g:neo_tree_remove_legacy_commands = 1 ]]
 
 -- Set to true if you have a Nerd Font installed and selected in the terminal
 vim.g.have_nerd_font = false
@@ -207,10 +237,11 @@ vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' }
 --  Use CTRL+<hjkl> to switch between windows
 --
 --  See `:help wincmd` for a list of all window commands
-vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
-vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
-vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
-vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
+-- NOTE: Aaditya disabled this due to C-j conflict
+-- vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
+-- vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
+-- vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
+-- vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
 -- NOTE: Some terminals have colliding keymaps or are not able to send distinct keycodes
 -- vim.keymap.set("n", "<C-S-h>", "<C-w>H", { desc = "Move window to the left" })
@@ -321,6 +352,15 @@ require('lazy').setup({
         { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } }, -- Enable gitsigns recommended keymaps first
         { 'gr', group = 'LSP Actions', mode = { 'n' } },
       },
+
+      -- NOTE: Aaditya added
+      signs = {
+        add = { text = '+' },
+        change = { text = '~' },
+        delete = { text = '_' },
+        topdelete = { text = '‾' },
+        changedelete = { text = '~' },
+      },
     },
   },
 
@@ -357,6 +397,11 @@ require('lazy').setup({
         -- installed and loaded.
         cond = function() return vim.fn.executable 'make' == 1 end,
       },
+
+      -- NOTE: Aaditya added
+      { 'nvim-telescope/telescope-file-browser.nvim' },
+      { 'nvim-telescope/telescope-live-grep-args.nvim' },
+
       { 'nvim-telescope/telescope-ui-select.nvim' },
 
       -- Useful for getting pretty icons, but requires a Nerd Font.
@@ -384,6 +429,41 @@ require('lazy').setup({
 
       -- [[ Configure Telescope ]]
       -- See `:help telescope` and `:help telescope.setup()`
+
+      -- NOTE: Aaditya added this block based on https://github.com/nvim-telescope/telescope.nvim/issues/2201#issuecomment-1284691502
+      local ts_select_dir_for_grep = function(prompt_bufnr)
+        local action_state = require 'telescope.actions.state'
+        local fb = require('telescope').extensions.file_browser
+        local live_grep = require('telescope').extensions.live_grep_args.live_grep_args
+        local current_line = action_state.get_current_line()
+
+        fb.file_browser {
+          files = false,
+          depth = false,
+          attach_mappings = function(prompt_bufnr)
+            require('telescope.actions').select_default:replace(function()
+              local entry_path = action_state.get_selected_entry().Path
+              local dir = entry_path:is_dir() and entry_path or entry_path:parent()
+              local relative = dir:make_relative(vim.fn.getcwd())
+              local absolute = dir:absolute()
+
+              live_grep {
+                results_title = relative .. '/',
+                cwd = absolute,
+                default_text = current_line,
+                additional_args = function()
+                  return { "--glob=!*CHANGELOG.rst" }
+                end,
+              }
+            end)
+
+            return true
+          end,
+        }
+      end
+
+      local lga_actions = require 'telescope-live-grep-args.actions'
+
       require('telescope').setup {
         -- You can put your default mappings / updates / etc. in here
         --  All the info you're looking for is in `:help telescope.setup()`
@@ -393,15 +473,43 @@ require('lazy').setup({
         --     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
         --   },
         -- },
-        -- pickers = {}
+        -- pickers = {},
         extensions = {
           ['ui-select'] = { require('telescope.themes').get_dropdown() },
+          -- NOTE: Aaditya added this extension
+          live_grep_args = {
+            auto_quoting = true, -- enable/disable auto-quoting
+            additional_args = function()
+              return { "--glob=!*CHANGELOG.rst" }
+            end,
+            -- define mappings, e.g.
+            mappings = { -- extend mappings
+              i = {
+                ['<C-K>'] = lga_actions.quote_prompt(),
+                ['<C-i>'] = lga_actions.quote_prompt { postfix = ' --iglob ' },
+                -- freeze the current list and start a fuzzy search in the frozen list
+                ['<C-space>'] = lga_actions.to_fuzzy_refine,
+                ['<C-f>'] = ts_select_dir_for_grep,
+              },
+              n = {
+                ['<C-f>'] = ts_select_dir_for_grep,
+              },
+            },
+            -- ... also accepts theme settings, for example:
+            -- theme = "dropdown", -- use dropdown theme
+            -- theme = { }, -- use own theme spec
+            -- layout_config = { mirror=true }, -- mirror preview pane
+          },
         },
       }
 
       -- Enable Telescope extensions if they are installed
       pcall(require('telescope').load_extension, 'fzf')
       pcall(require('telescope').load_extension, 'ui-select')
+
+      -- NOTE: Aaditya added this block
+      pcall(require('telescope').load_extension, 'file_browser')
+      pcall(require('telescope').load_extension, 'live_grep_args')
 
       -- See `:help telescope.builtin`
       local builtin = require 'telescope.builtin'
@@ -410,7 +518,8 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
       vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
       vim.keymap.set({ 'n', 'v' }, '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
-      vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
+      -- NOTE: Aaditya replaced the builtin live_grep
+      vim.keymap.set('n', '<leader>sg', require('telescope').extensions.live_grep_args.live_grep_args, { desc = '[S]earch by [G]rep' })
       vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
       vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
       vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
@@ -600,10 +709,10 @@ require('lazy').setup({
       --  See `:help lsp-config` for information about keys and how to configure
       ---@type table<string, vim.lsp.Config>
       local servers = {
-        -- clangd = {},
+        clangd = {},
         -- gopls = {},
-        -- pyright = {},
-        -- rust_analyzer = {},
+        pyright = {},
+        rust_analyzer = {},
         --
         -- Some languages (like typescript) have entire language plugins that can be useful:
         --    https://github.com/pmizio/typescript-tools.nvim
@@ -669,48 +778,7 @@ require('lazy').setup({
     end,
   },
 
-  { -- Autoformat
-    'stevearc/conform.nvim',
-    event = { 'BufWritePre' },
-    cmd = { 'ConformInfo' },
-    keys = {
-      {
-        '<leader>f',
-        function() require('conform').format { async = true } end,
-        mode = '',
-        desc = '[F]ormat buffer',
-      },
-    },
-    ---@module 'conform'
-    ---@type conform.setupOpts
-    opts = {
-      notify_on_error = false,
-      format_on_save = function(bufnr)
-        -- You can specify filetypes to autoformat on save here:
-        local enabled_filetypes = {
-          -- lua = true,
-          -- python = true,
-        }
-        if enabled_filetypes[vim.bo[bufnr].filetype] then
-          return { timeout_ms = 500 }
-        else
-          return nil
-        end
-      end,
-      default_format_opts = {
-        lsp_format = 'fallback', -- Use external formatters if configured below, otherwise use LSP formatting. Set to `false` to disable LSP formatting entirely.
-      },
-      -- You can also specify external formatters in here.
-      formatters_by_ft = {
-        -- rust = { 'rustfmt' },
-        -- Conform can also run multiple formatters sequentially
-        -- python = { "isort", "black" },
-        --
-        -- You can use 'stop_after_first' to run the first available formatter from the list
-        -- javascript = { "prettierd", "prettier", stop_after_first = true },
-      },
-    },
-  },
+  -- NOTE: Aaditya removed autoformatter block
 
   { -- Autocompletion
     'saghen/blink.cmp',
@@ -767,7 +835,8 @@ require('lazy').setup({
         -- <c-k>: Toggle signature help
         --
         -- See :h blink-cmp-config-keymap for defining your own keymap
-        preset = 'default',
+        -- NOTE: Aaditya removed default and replaced with C-k. C-k keybinding conflicted with Down in insert mode
+        ['<C-k>'] = false,
 
         -- For more advanced Luasnip keymaps (e.g. selecting choice nodes, expansion) see:
         --    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
@@ -889,7 +958,7 @@ require('lazy').setup({
     -- [[ Configure Treesitter ]] See `:help nvim-treesitter-intro`
     config = function()
       -- ensure basic parser are installed
-      local parsers = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' }
+      local parsers = { 'bash', 'c', 'cpp', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'python', 'query', 'rust', 'toml', 'vim', 'vimdoc', 'xml', 'yaml' }
       require('nvim-treesitter').install(parsers)
 
       ---@param buf integer
@@ -918,8 +987,8 @@ require('lazy').setup({
         callback = function(args)
           local buf, filetype = args.buf, args.match
 
-          local language = vim.treesitter.language.get_lang(filetype)
-          if not language then return end
+            local language = vim.treesitter.language.get_lang(filetype)
+            if not language then return end
 
           local installed_parsers = require('nvim-treesitter').get_installed 'parsers'
 
@@ -964,6 +1033,198 @@ require('lazy').setup({
   -- Or use telescope!
   -- In normal mode type `<space>sh` then write `lazy.nvim-plugin`
   -- you can continue same window with `<space>sr` which resumes last telescope search
+
+  -- NOTE: Aaditya's additional plugins
+  -- Git related plugins
+  {
+    'tpope/vim-fugitive',
+    config = function()
+      vim.keymap.set('n', '<leader>ga', ':Git add %:p<CR><CR>', { desc = '[G]it [A]dd' })
+      vim.keymap.set('n', '<leader>gs', ':Git<CR>', { desc = '[G]it [S]tatus' })
+      vim.keymap.set('n', '<leader>gb', ':Git blame<CR>', { desc = '[G]it [B]lame' })
+      vim.keymap.set('n', '<leader>gd', ':Gdiffsplit<CR>', { desc = '[G]it [D]iff' })
+      vim.keymap.set('n', '<leader>gc', ':G commit<CR><CR>', { desc = '[G]it [C]ommit' })
+      vim.keymap.set('n', '<leader>gl', ':Glog<CR>', { desc = '[G]it [L]og' })
+      vim.keymap.set('n', '<leader>gp', ':Git pull<CR>', { desc = '[G]it [P]ull' })
+      vim.keymap.set('n', '<leader>gP', ':Git push<CR>', { desc = '[G]it [P]ush' })
+      vim.keymap.set('n', '<leader>gS', ':Git stash<CR>', { desc = '[G]it [S]tash' })
+      vim.keymap.set('n', '<leader>gv', ':vert Git<CR>', { desc = '[G]it Status [V]ertical' })
+    end,
+  },
+  {
+    'MeanderingProgrammer/render-markdown.nvim',
+    dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-mini/mini.nvim' },
+    ---@module 'render-markdown'
+    ---@type render.md.UserConfig
+    opts = {},
+  },
+  'sindrets/diffview.nvim',
+  'tpope/vim-rhubarb',
+
+  -- Detect tabstop and shiftwidth automatically
+  'tpope/vim-sleuth',
+
+  {
+    'vim-airline/vim-airline',
+    config = function()
+      vim.g['airline#extensions#tabline#enabled'] = 1
+      vim.g['airline#extensions#tabline#formatter'] = 'unique_tail_improved'
+      vim.g['airline_powerline_fonts'] = 1
+      vim.keymap.set('', '<C-h>', ':bp<CR>', { desc = '[B]uffer [P]rev' })
+      vim.keymap.set('', '<C-l>', ':bn<CR>', { desc = '[B]uffer [N]ext' })
+    end,
+  },
+  {
+    'vim-airline/vim-airline-themes',
+  },
+
+  {
+    -- Add indentation guides even on blank lines
+    'lukas-reineke/indent-blankline.nvim',
+    main = 'ibl',
+    ---@module "ibl"
+    ---@type ibl.config
+    config = function()
+      require('ibl').setup {
+        whitespace = { highlight = { 'Whitespace', 'NonText', 'Function', 'Label' } },
+      }
+      vim.opt.listchars = { space = '·', tab = '→ ' }
+    end,
+  },
+
+  -- "gc" to comment visual regions/lines
+  { 'numToStr/Comment.nvim', opts = {} },
+
+  {
+    -- Autocompletion
+    'hrsh7th/nvim-cmp',
+    dependencies = {
+      -- Snippet Engine & its associated nvim-cmp source
+      'L3MON4D3/LuaSnip',
+      'saadparwaiz1/cmp_luasnip',
+
+      -- Adds LSP completion capabilities
+      'hrsh7th/cmp-nvim-lsp',
+
+      -- Adds a number of user-friendly snippets
+      'rafamadriz/friendly-snippets',
+    },
+  },
+
+  {
+    -- Fold code
+    'kevinhwang91/nvim-ufo',
+    dependencies = {
+      'kevinhwang91/promise-async',
+    },
+    config = function()
+      vim.o.foldcolumn = '1' -- '0' is not bad
+      vim.o.foldlevel = 99 -- Using ufo provider need a large value, feel free to decrease the value
+      vim.o.foldlevelstart = 99
+      vim.o.foldenable = true
+
+      -- Using ufo provider need remap `zR` and `zM`. If Neovim is 0.6.1, remap yourself
+      vim.keymap.set('n', 'zR', require('ufo').openAllFolds)
+      vim.keymap.set('n', 'zM', require('ufo').closeAllFolds)
+
+      -- Option 3: treesitter as a main provider instead
+      -- (Note: the `nvim-treesitter` plugin is *not* needed.)
+      -- ufo uses the same query files for folding (queries/<lang>/folds.scm)
+      -- performance and stability are better than `foldmethod=nvim_treesitter#foldexpr()`
+      require('ufo').setup {
+        provider_selector = function(bufnr, filetype, buftype) return { 'treesitter', 'indent' } end,
+      }
+    end,
+  },
+
+  {
+    'nvim-neo-tree/neo-tree.nvim',
+    branch = 'v3.x',
+    dependencies = {
+      'nvim-lua/plenary.nvim',
+      'MunifTanjim/nui.nvim',
+      'nvim-tree/nvim-web-devicons', -- optional, but recommended
+    },
+    lazy = false, -- neo-tree will lazily load itself
+    config = function()
+      -- [[ Configure Neotree's fonts ]]
+      require('neo-tree').setup {
+        sources = {
+          'filesystem',
+          'buffers',
+          'git_status',
+          'document_symbols',
+        },
+        default_component_configs = {
+          icon = {
+            folder_empty = '󰜌',
+            folder_empty_open = '󰜌',
+          },
+          git_status = {
+            symbols = {
+              renamed = '󰁕',
+              unstaged = '󰄱',
+            },
+          },
+        },
+        document_symbols = {
+          kinds = {
+            File = { icon = '󰈙', hl = 'Tag' },
+            Namespace = { icon = '󰌗', hl = 'Include' },
+            Package = { icon = '󰏖', hl = 'Label' },
+            Class = { icon = '󰌗', hl = 'Include' },
+            Property = { icon = '󰆧', hl = '@property' },
+            Enum = { icon = '󰒻', hl = '@number' },
+            Function = { icon = '󰊕', hl = 'Function' },
+            String = { icon = '󰀬', hl = 'String' },
+            Number = { icon = '󰎠', hl = 'Number' },
+            Array = { icon = '󰅪', hl = 'Type' },
+            Object = { icon = '󰅩', hl = 'Type' },
+            Key = { icon = '󰌋', hl = '' },
+            Struct = { icon = '󰌗', hl = 'Type' },
+            Operator = { icon = '󰆕', hl = 'Operator' },
+            TypeParameter = { icon = '󰊄', hl = 'Type' },
+            StaticMethod = { icon = '󰠄 ', hl = 'Function' },
+          },
+        },
+        filesystem = {
+          filtered_items = {
+            visible = false, -- hide filtered items on open
+            hide_by_name = {
+              'package-lock.json',
+              '.changeset',
+              '.prettierrc.json',
+            },
+          },
+          follow_current_file = {
+            enabled = true,
+          },
+          use_libuv_file_watcher = true,
+        },
+        -- Add this section only if you've configured source selector.
+        source_selector = {
+          winbar = true,
+          sources = {
+            { source = 'filesystem', display_name = ' 󰉓 Files ' },
+            { source = 'document_symbols', display_name = '󰆧 Symbols ' },
+            { source = 'buffers', display_name = ' 󰈙 Buffers ' },
+            { source = 'git_status', display_name = ' 󰊢 Git ' },
+          },
+        },
+      }
+
+      -- Set key mapping to toggle Neotree
+      vim.api.nvim_set_keymap('n', '<Leader>n', ':Neotree toggle<CR>', { noremap = true, silent = true })
+      local function autochdir(data)
+        -- buffer is a directory
+        local directory = vim.fn.isdirectory(data.file) == 1
+        if not directory then return end
+        -- change to the directory
+        vim.cmd.cd(data.file)
+      end
+      vim.api.nvim_create_autocmd({ 'VimEnter' }, { callback = autochdir })
+    end,
+  },
 }, { ---@diagnostic disable-line: missing-fields
   ui = {
     -- If you are using a Nerd Font: set icons to an empty table which will use the
@@ -984,6 +1245,10 @@ require('lazy').setup({
       lazy = '💤 ',
     },
   },
+
+  -- NOTE: Aaditya added to handle ENAMETOOLONG
+  root = vim.fn.expand '~/nvim-plugins',
+  cache = vim.fn.expand '~/.cache/nvim/lazy',
 })
 
 -- The line beneath this is called `modeline`. See `:help modeline`
