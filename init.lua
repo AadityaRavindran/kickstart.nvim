@@ -98,23 +98,27 @@ vim.o.smartindent = true
 vim.opt.list = true
 vim.opt.listchars:append { space = '·' }
 
--- Aaditya added this block
+-- NOTE: Aaditya added this block
 vim.opt.colorcolumn = '100,120'
 vim.opt.runtimepath:remove(vim.fn.expand '~/.local/share/nvim/lazy')
 vim.opt.runtimepath:prepend(vim.fn.expand '~/nvim-plugins')
-
--- Unless you are still migrating, remove the deprecated commands from v1.x
-vim.cmd [[ let g:neo_tree_remove_legacy_commands = 1 ]]
-
-vim.api.nvim_set_keymap('i', 'jk', '<ESC>', { noremap = true })
+-- Add custom keymaps
+vim.api.nvim_set_keymap('i', '<C-h>', '<Left>', { noremap = true })
+vim.api.nvim_set_keymap('i', '<C-l>', '<Right>', { noremap = true })
+vim.api.nvim_set_keymap('i', '<C-j>', '<Down>', { noremap = true })
+vim.api.nvim_set_keymap('i', '<C-k>', '<Up>', { noremap = true })
+vim.api.nvim_set_keymap('i', '<C-s>', '<ESC>w', { noremap = true })
+vim.api.nvim_set_keymap('i', '<C-d>', '<C-d>zz', { noremap = true })
+vim.api.nvim_set_keymap('i', '<C-u>', '<C-u>zz', { noremap = true })
 vim.api.nvim_set_keymap('', '<C-d>', '<C-d>zz', { noremap = true })
 vim.api.nvim_set_keymap('', '<C-u>', '<C-u>zz', { noremap = true })
-vim.api.nvim_set_keymap('', '<C-j>', 'viw"0p<ESC>', { noremap = true })
-
--- Aaditya added this block
+vim.api.nvim_set_keymap('', '<C-p>', 'viw"0p<ESC>', { noremap = true })
 -- Remap for dealing with word wrap
 vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
 vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
+
+-- Unless you are still migrating, remove the deprecated commands from v1.x
+vim.cmd [[ let g:neo_tree_remove_legacy_commands = 1 ]]
 
 -- Set to true if you have a Nerd Font installed and selected in the terminal
 vim.g.have_nerd_font = false
@@ -220,7 +224,7 @@ vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' }
 --  Use CTRL+<hjkl> to switch between windows
 --
 --  See `:help wincmd` for a list of all window commands
--- Aaditya disabled this due to C-j conflict
+-- NOTE: Aaditya disabled this due to C-j conflict
 -- vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
 -- vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
 -- vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
@@ -376,7 +380,7 @@ require('lazy').setup({
         { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
       },
 
-      -- Aaditya added
+      -- NOTE: Aaditya added
       signs = {
         add = { text = '+' },
         change = { text = '~' },
@@ -413,7 +417,7 @@ require('lazy').setup({
         end,
       },
 
-      -- Aaditya added
+      -- NOTE: Aaditya added
       { 'nvim-telescope/telescope-file-browser.nvim' },
       { 'nvim-telescope/telescope-live-grep-args.nvim' },
 
@@ -445,7 +449,7 @@ require('lazy').setup({
       -- [[ Configure Telescope ]]
       -- See `:help telescope` and `:help telescope.setup()`
 
-      -- Aaditya added this block based on
+      -- NOTE: Aaditya added this block based on https://github.com/nvim-telescope/telescope.nvim/issues/2201#issuecomment-1284691502
       local ts_select_dir_for_grep = function(prompt_bufnr)
         local action_state = require 'telescope.actions.state'
         local fb = require('telescope').extensions.file_browser
@@ -491,13 +495,13 @@ require('lazy').setup({
             require('telescope.themes').get_dropdown(),
           },
 
-          -- Aaditya added this extension
+          -- NOTE: Aaditya added this extension
           live_grep_args = {
             auto_quoting = true, -- enable/disable auto-quoting
             -- define mappings, e.g.
             mappings = { -- extend mappings
               i = {
-                ['<C-k>'] = lga_actions.quote_prompt(),
+                ['<C-K>'] = lga_actions.quote_prompt(),
                 ['<C-i>'] = lga_actions.quote_prompt { postfix = ' --iglob ' },
                 -- freeze the current list and start a fuzzy search in the frozen list
                 ['<C-space>'] = lga_actions.to_fuzzy_refine,
@@ -519,7 +523,7 @@ require('lazy').setup({
       pcall(require('telescope').load_extension, 'fzf')
       pcall(require('telescope').load_extension, 'ui-select')
 
-      -- Aaditya added this block
+      -- NOTE: Aaditya added this block
       pcall(require('telescope').load_extension, 'file_browser')
       pcall(require('telescope').load_extension, 'live_grep_args')
 
@@ -535,10 +539,9 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
       vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
 
-      -- Aaditya added this block and removed the builtin live_grep
+      -- NOTE: Aaditya added this block and removed the builtin live_grep
       vim.keymap.set('n', '<leader>sg', require('telescope').extensions.live_grep_args.live_grep_args, { desc = '[S]earch by [G]rep' })
       vim.keymap.set('n', '<leader>gf', require('telescope.builtin').git_files, { desc = 'Search [G]it [F]iles' })
-      vim.keymap.set('n', '<C-p>', require('telescope.builtin').find_files, { desc = '[S]earch [F]iles' })
 
       -- Slightly advanced example of overriding default behavior and theme
       vim.keymap.set('n', '<leader>/', function()
@@ -593,7 +596,15 @@ require('lazy').setup({
       { 'j-hui/fidget.nvim', opts = {} },
 
       -- Allows extra capabilities provided by blink.cmp
-      'saghen/blink.cmp',
+      -- NOTE: Aaditya modified this to remove C-k keybinding conflict with Down in insert mode
+      {
+        'saghen/blink.cmp',
+        config = function()
+          require('blink.cmp').setup {
+            keymap = { ['<C-k>'] = false }
+          }
+        end,
+      },
     },
     config = function()
       -- Brief aside: **What is LSP?**
@@ -837,7 +848,7 @@ require('lazy').setup({
         },
       }
 
-      -- Aaditya added this block
+      -- NOTE: Aaditya added this block
       require('lspconfig').clangd.setup {
         cmd = { 'clangd', '--header-insertion=never' },
       }
@@ -855,46 +866,7 @@ require('lazy').setup({
     end,
   },
 
-  { -- Autoformat
-    'stevearc/conform.nvim',
-    event = { 'BufWritePre' },
-    cmd = { 'ConformInfo' },
-    keys = {
-      {
-        '<leader>f',
-        function()
-          require('conform').format { async = true, lsp_format = 'fallback' }
-        end,
-        mode = '',
-        desc = '[F]ormat buffer',
-      },
-    },
-    opts = {
-      notify_on_error = false,
-      format_on_save = function(bufnr)
-        -- Disable "format_on_save lsp_fallback" for languages that don't
-        -- have a well standardized coding style. You can add additional
-        -- languages here or re-enable it for the disabled ones.
-        local disable_filetypes = { c = true, cpp = true }
-        if disable_filetypes[vim.bo[bufnr].filetype] then
-          return nil
-        else
-          return {
-            timeout_ms = 500,
-            lsp_format = 'fallback',
-          }
-        end
-      end,
-      formatters_by_ft = {
-        lua = { 'stylua' },
-        -- Conform can also run multiple formatters sequentially
-        -- python = { "isort", "black" },
-        --
-        -- You can use 'stop_after_first' to run the first available formatter from the list
-        -- javascript = { "prettierd", "prettier", stop_after_first = true },
-      },
-    },
-  },
+  -- NOTE: Aaditya removed autoformatter
 
   { -- Autocompletion
     'saghen/blink.cmp',
@@ -1110,7 +1082,7 @@ require('lazy').setup({
   -- In normal mode type `<space>sh` then write `lazy.nvim-plugin`
   -- you can continue same window with `<space>sr` which resumes last telescope search
 
-  -- Aaditya's additional plugins
+  -- NOTE: Aaditya's additional plugins
   -- Git related plugins
   {
     'tpope/vim-fugitive',
@@ -1318,7 +1290,7 @@ require('lazy').setup({
     },
   },
 
-  -- Aaditya added to handle ENAMETOOLONG
+  -- NOTE: Aaditya added to handle ENAMETOOLONG
   root = vim.fn.expand '~/nvim-plugins',
   cache = vim.fn.expand '~/.cache/nvim/lazy',
 })
