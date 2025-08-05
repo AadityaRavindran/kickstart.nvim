@@ -449,7 +449,7 @@ require('lazy').setup({
       local ts_select_dir_for_grep = function(prompt_bufnr)
         local action_state = require 'telescope.actions.state'
         local fb = require('telescope').extensions.file_browser
-        local live_grep = require('telescope').extension.live_grep_args.live_grep
+        local live_grep = require('telescope').extensions.live_grep_args.live_grep_args
         local current_line = action_state.get_current_line()
 
         fb.file_browser {
@@ -486,19 +486,6 @@ require('lazy').setup({
         --   },
         -- },
         -- pickers = {},
-        -- Aaditya added picker options
-        pickers = {
-          live_grep = {
-            mappings = {
-              i = {
-                ['<C-f>'] = ts_select_dir_for_grep,
-              },
-              n = {
-                ['<C-f>'] = ts_select_dir_for_grep,
-              },
-            },
-          },
-        },
         extensions = {
           ['ui-select'] = {
             require('telescope.themes').get_dropdown(),
@@ -514,6 +501,10 @@ require('lazy').setup({
                 ['<C-i>'] = lga_actions.quote_prompt { postfix = ' --iglob ' },
                 -- freeze the current list and start a fuzzy search in the frozen list
                 ['<C-space>'] = lga_actions.to_fuzzy_refine,
+                ['<C-f>'] = ts_select_dir_for_grep,
+              },
+              n = {
+                ['<C-f>'] = ts_select_dir_for_grep,
               },
             },
             -- ... also accepts theme settings, for example:
