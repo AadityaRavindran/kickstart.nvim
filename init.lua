@@ -1141,51 +1141,18 @@ require('lazy').setup({
   -- Detect tabstop and shiftwidth automatically
   'tpope/vim-sleuth',
 
-  -- Add quality of life improvement plugins
   {
     'vim-airline/vim-airline',
     config = function()
-      -- Enable airline
-      -- Enable statusline
-      vim.g['airline#extensions#fugitive#enabled'] = 1
-      vim.g['airline#extensions#branch#enabled'] = 1
       vim.g['airline#extensions#tabline#enabled'] = 1
-      vim.g['airline#extensions#tabline#left_sep'] = ' '
-      vim.g['airline#extensions#tabline#left_alt_sep'] = '|'
       vim.g['airline#extensions#tabline#formatter'] = 'unique_tail_improved'
       vim.g['airline_powerline_fonts'] = 1
-      vim.g['airline_statusline_ontop'] = 1
+      vim.keymap.set('', '<C-h>', ':bp<CR>', { desc = '[B]uffer [P]rev' })
+      vim.keymap.set('', '<C-l>', ':bn<CR>', { desc = '[B]uffer [N]ext' })
     end,
   },
   {
     'vim-airline/vim-airline-themes',
-    config = function()
-      vim.g['airline_theme'] = 'solarized'
-    end,
-  },
-  'embear/vim-uncrustify',
-
-  {
-    -- Theme inspired by Atom
-    'navarasu/onedark.nvim',
-    priority = 1000,
-    config = function()
-      vim.cmd.colorscheme 'onedark'
-    end,
-  },
-
-  {
-    -- Set lualine as statusline
-    'nvim-lualine/lualine.nvim',
-    -- See `:help lualine.txt`
-    opts = {
-      options = {
-        icons_enabled = false,
-        theme = 'onedark',
-        component_separators = '|',
-        section_separators = '',
-      },
-    },
   },
 
   {
@@ -1195,35 +1162,7 @@ require('lazy').setup({
     ---@module "ibl"
     ---@type ibl.config
     config = function()
-      -- local highlight = {
-      --   'RainbowRed',
-      --   'RainbowYellow',
-      --   'RainbowBlue',
-      --   'RainbowOrange',
-      --   'RainbowGreen',
-      --   'RainbowViolet',
-      --   'RainbowCyan',
-      -- }
-
-      local hooks = require 'ibl.hooks'
-      -- create the highlight groups in the highlight setup hook, so they are reset
-      -- every time the colorscheme changes
-      -- hooks.register(hooks.type.HIGHLIGHT_SETUP, function()
-      --   vim.api.nvim_set_hl(0, 'RainbowRed', { fg = '#E06C75' })
-      --   vim.api.nvim_set_hl(0, 'RainbowYellow', { fg = '#E5C07B' })
-      --   vim.api.nvim_set_hl(0, 'RainbowBlue', { fg = '#61AFEF' })
-      --   vim.api.nvim_set_hl(0, 'RainbowOrange', { fg = '#D19A66' })
-      --   vim.api.nvim_set_hl(0, 'RainbowGreen', { fg = '#98C379' })
-      --   vim.api.nvim_set_hl(0, 'RainbowViolet', { fg = '#C678DD' })
-      --   vim.api.nvim_set_hl(0, 'RainbowCyan', { fg = '#56B6C2' })
-      -- end)
-      hooks.register(hooks.type.WHITESPACE, hooks.builtin.hide_first_space_indent_level)
-
       require('ibl').setup {
-        -- indent = {
-        --   highlight = highlight,
-        --   char = '|',
-        -- },
         whitespace = { highlight = { 'Whitespace', 'NonText', 'Function', 'Label' } },
       }
       vim.opt.listchars = { space = '·', tab = '→ ' }
